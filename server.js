@@ -3,23 +3,18 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
 const { MongoClient } = require('mongodb');
+app.set('view engine', 'ejs');
 
 var db;
 const uri = "mongodb+srv://admin:admin1234@cluster0.irzrs.mongodb.net/todoapp?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-client.connect(err => {
-
-	db = client.db('todoapp');
-
-	db.collection('post').insertOne( {이름 : 'John', 나이 : 20 }, function(err, result){
-		console.log('저장완료');
-	});
-
-  app.listen('8080', function(){
-		console.log('listening on 8080');
-	});
-  client.close();
-});
+MongoClient.connect(uri,
+function(err, client) {
+    if (err) {return console.log(err)}
+    db = client.db('todoapp')
+    app.listen(8080, function() {
+        console.log('listening on 8080')
+    });
+})
 
 
 app.get('/pet', function(req, res){
@@ -38,9 +33,19 @@ app.get('/write', function(req, res){
 	res.sendFile(__dirname + '/write.html');
 });
 
+// app.post('/add', function(req, res){
+// 	res.send('전송완료');
+// 	console.log(req.body);
+// 	console.log(req.body.title);
+// });
+
 app.post('/add', function(req, res){
 	res.send('전송완료');
-	console.log(req.body);
-	console.log(req.body.title);
+	db.collection('post').insertOne({title: req.body.title, data: req.body.date}, function(){
+		console.log('저장완료');
+	});
 });
 
+app.get('/list', function(req, res){
+	res.render('list.ejs');
+});
