@@ -29,6 +29,12 @@
 				</div>
 			</div>
 		</nav>
+		<% for (var i=0; i<posts.length; i++){ %>
+			<div>
+				<h4>할 일 : <%= posts[i].title %></h4>
+				<p>날짜 : <%= posts[i].date %></p>
+			</div>
+		<% } %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
   </body>
 </html>

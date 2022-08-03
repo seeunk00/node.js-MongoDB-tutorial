@@ -40,12 +40,23 @@ app.get('/write', function(req, res){
 // });
 
 app.post('/add', function(req, res){
-	res.send('전송완료');
-	db.collection('post').insertOne({title: req.body.title, data: req.body.date}, function(){
-		console.log('저장완료');
-	});
+	db.collection('counter').findOne({name : '게시물갯수'}, function(err, result){
+    var 총게시물갯수 = result.totalPost;
+    db.collection('post').insertOne( { _id : (총게시물갯수 + 1), title : req.body.title, 날짜 : req.body.date } , function(){
+      console.log('저장완료');
+			db.collection('counter').updateOne({name: '게시물갯수'}, { $inc : { totalPost: 1 } }, function(err, result){
+				if (err) {
+					return console.log(err);
+				}
+			});
+      res.send('전송완료');
+    });
+  });
 });
 
 app.get('/list', function(req, res){
-	res.render('list.ejs');
+	db.collection('post').find().toArray(function(err, result){
+		console.log(result);
+		res.render('list.ejs', { posts : result });
+	});
 });
