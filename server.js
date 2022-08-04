@@ -42,7 +42,7 @@ app.get('/write', function(req, res){
 app.post('/add', function(req, res){
 	db.collection('counter').findOne({name : '게시물갯수'}, function(err, result){
     var 총게시물갯수 = result.totalPost;
-    db.collection('post').insertOne( { _id : (총게시물갯수 + 1), title : req.body.title, 날짜 : req.body.date } , function(){
+    db.collection('post').insertOne( { _id : (총게시물갯수 + 1), title : req.body.title, date : req.body.date } , function(){
       console.log('저장완료');
 			db.collection('counter').updateOne({name: '게시물갯수'}, { $inc : { totalPost: 1 } }, function(err, result){
 				if (err) {
