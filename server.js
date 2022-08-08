@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended : true}));
 const { MongoClient } = require('mongodb');
 app.set('view engine', 'ejs');
+app.use('/public', express.static('public'));
 
 var db;
 const uri = "mongodb+srv://admin:admin1234@cluster0.irzrs.mongodb.net/todoapp?retryWrites=true&w=majority";
@@ -26,11 +27,11 @@ app.get('/beauty', function(req, res){
 });
 
 app.get('/', function(req, res){
-	res.sendFile(__dirname + '/index.html');
+	res.render('index.ejs');
 });
 
 app.get('/write', function(req, res){
-	res.sendFile(__dirname + '/write.html');
+	res.render('write.ejs');
 });
 
 // app.post('/add', function(req, res){
@@ -71,5 +72,8 @@ app.delete('/delete', function(req, res){
 });
 
 app.get('/detail/:id', function(req, res){
-	res.render('detail.ejs', {});
+	db.collection('post').findOne({_id: parseInt(req.params.id)}, function(err, result){
+		console.log(result);
+		res.render('detail.ejs', { data : result });
+	});
 });
