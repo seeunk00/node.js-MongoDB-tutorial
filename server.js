@@ -5,6 +5,8 @@ app.use(bodyParser.urlencoded({extended : true}));
 const { MongoClient } = require('mongodb');
 app.set('view engine', 'ejs');
 app.use('/public', express.static('public'));
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
 
 var db;
 const uri = "mongodb+srv://admin:admin1234@cluster0.irzrs.mongodb.net/todoapp?retryWrites=true&w=majority";
@@ -75,5 +77,11 @@ app.get('/detail/:id', function(req, res){
 	db.collection('post').findOne({_id: parseInt(req.params.id)}, function(err, result){
 		console.log(result);
 		res.render('detail.ejs', { data : result });
+	});
+});
+
+app.get('/edit/:id', function(req, res){
+	db.collection('post').findOne({_id : parseInt(req.params.id)}, function(err, result){
+		res.render('edit.ejs', { post : result });
 	});
 });
