@@ -111,6 +111,19 @@ app.post('/login', passport.authenticate('local', {
 	res.redirect('/');
 });
 
+app.get('/mypage', isUserLogin, function(req, res){
+	console.log(req.user);
+	res.render('mypage.ejs', {user : req.user});
+});
+
+function isUserLogin(req, res, next){
+	if (req.user) {
+		next()
+	} else {
+		res.send('로그인이 필요합니다.');
+	}
+}
+
 passport.use(new LocalStrategy({
 	usernameField: 'id',
   passwordField: 'pw',
@@ -133,5 +146,7 @@ passport.serializeUser(function (user, done) {
 });
 
 passport.deserializeUser(function (id, done) {
-  done(null, {})
+	db.collection('login').findOne({id : id}, function(err, result){
+		done(null, result)
+	});
 });
