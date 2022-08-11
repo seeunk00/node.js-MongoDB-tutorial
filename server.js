@@ -117,10 +117,8 @@ passport.use(new LocalStrategy({
   session: true,
   passReqToCallback: false,
 }, function (inputId, inputPw, done) {
-  //console.log(입력한아이디, 입력한비번);
   db.collection('login').findOne({ id: inputId }, function (err, result) {
     if (err) return done(err)
-
     if (!result) return done(null, false, { message: '존재하지 않는 아이디입니다.' })
     if (inputPw == result.pw) {
       return done(null, result)
@@ -129,3 +127,11 @@ passport.use(new LocalStrategy({
     }
   })
 }));
+
+passport.serializeUser(function (user, done) {
+  done(null, user.id)
+});
+
+passport.deserializeUser(function (id, done) {
+  done(null, {})
+});
