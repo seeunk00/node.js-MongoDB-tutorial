@@ -22,7 +22,6 @@
 								<p>글 번호 : <%= posts[i]._id %></p>
 								<h5>할 일 : <%= posts[i].title %></h5>
 								<p>날짜 : <%= posts[i].date %></p>
-								<button class="btn btn-danger delete" data-id="<%= posts[i]._id %>" type="button" style="float: right;">삭제</button>
 							</div>
 						</li>
 					<% } %>
@@ -32,22 +31,6 @@
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 		<script>
-			// 삭제하기 기능
-			$('.delete').click(function(e){
-				var postNumber = e.target.dataset.id;
-				var clicked = $(this);
-				$.ajax({
-					method : 'DELETE',
-					url : '/delete',
-					data : { _id : postNumber }
-				}).done(function(result){
-					console.log('성공');
-					clicked.parent('li').fadeOut();
-				}).fail(function(xhr, testStatus, errorThrown){
-					console.log(xhr, testStatus, errorThrown);
-				});
-			});
-
 			// 검색하기 기능
 			$('#search').click(function(){
 				var input = $('#searchInput').val();

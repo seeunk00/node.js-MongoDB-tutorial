@@ -7,14 +7,15 @@ app.set('view engine', 'ejs');
 app.use('/public', express.static('public'));
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
+require('dotenv').config()
 
 var db;
-const uri = "mongodb+srv://admin:admin1234@cluster0.irzrs.mongodb.net/todoapp?retryWrites=true&w=majority";
+const uri = process.env.DB_URL
 MongoClient.connect(uri,
 function(err, client) {
     if (err) {return console.log(err)}
     db = client.db('todoapp')
-    app.listen(8080, function() {
+    app.listen(process.env.PORT, function() {
         console.log('listening on 8080')
     });
 })
@@ -22,25 +23,25 @@ function(err, client) {
 
 app.get('/pet', function(req, res){
 	res.send('펫 용품 쇼핑할 수 있는 페이지입니다.');
-});
+})
 
 app.get('/beauty', function(req, res){
 	res.send('뷰티 용품 쇼핑할 수 있는 페이지입니다.');
-});
+})
 
 app.get('/', function(req, res){
 	res.render('index.ejs');
-});
+})
 
 app.get('/write', function(req, res){
 	res.render('write.ejs');
-});
+})
 
 // app.post('/add', function(req, res){
 // 	res.send('전송완료');
 // 	console.log(req.body);
 // 	console.log(req.body.title);
-// });
+// })
 
 app.post('/add', function(req, res){
 	db.collection('counter').findOne({name : '게시물갯수'}, function(err, result){
@@ -51,18 +52,18 @@ app.post('/add', function(req, res){
 				if (err) {
 					return console.log(err);
 				}
-			});
+			})
       res.send('전송완료');
-    });
-  });
-});
+    })
+  })
+})
 
 app.get('/list', function(req, res){
 	db.collection('post').find().toArray(function(err, result){
 		console.log(result);
 		res.render('list.ejs', { posts : result });
-	});
-});
+	})
+})
 
 app.delete('/delete', function(req, res){
 	console.log(req.body);
@@ -70,55 +71,63 @@ app.delete('/delete', function(req, res){
 	db.collection('post').deleteOne(req.body, function(err, result){
 		console.log('삭제완료');
 		res.status(200).send({ message : '성공했습니다'});
-	});
-});
+	})
+})
 
 app.get('/detail/:id', function(req, res){
 	db.collection('post').findOne({_id: parseInt(req.params.id)}, function(err, result){
 		console.log(result);
 		res.render('detail.ejs', { data : result });
-	});
-});
+	})
+})
 
 app.get('/edit/:id', function(req, res){
 	db.collection('post').findOne({_id : parseInt(req.params.id)}, function(err, result){
 		res.render('edit.ejs', { post : result });
-	});
-});
+	})
+})
 
 app.put('/edit', function(req, res){
 	db.collection('post').updateOne({ _id : parseInt(req.body.id) }, { $set : { title : req.body.title, date : req.body.date } }, function(err, result){
 		console.log('수정완료');
 		res.redirect('/list');
-	});
-});
+	})
+})
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 
-app.use(session({secret: '비밀코드', resave : true, saveUninitialized : false}));
+app.use(session({secret: '비밀코드', resave : true, saveUninitialized : false}))
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/login', function(req, res){
 	res.render('login.ejs');
-});
+})
 
 app.post('/login', passport.authenticate('local', {
 	failureRedirect : '/fail'
 }), function(req, res){
 	res.redirect('/');
-});
+})
 
 app.get('/mypage', isUserLogin, function(req, res){
 	console.log(req.user);
 	res.render('mypage.ejs', {user : req.user});
-});
+})
+
+app.get('/search', (req, res) => {
+	console.log(req.query.value);
+	db.collection('post').find({ title : req.query.value }).toArray((err, result) => {
+		console.log(result);
+		res.render('search.ejs', { posts : result });
+	})
+})
 
 function isUserLogin(req, res, next){
 	if (req.user) {
-		next()
+		next();
 	} else {
 		res.send('로그인이 필요합니다.');
 	}
@@ -139,14 +148,14 @@ passport.use(new LocalStrategy({
       return done(null, false, { message: '비밀번호가 틀렸습니다.' })
     }
   })
-}));
+}))
 
 passport.serializeUser(function (user, done) {
   done(null, user.id)
-});
+})
 
 passport.deserializeUser(function (id, done) {
 	db.collection('login').findOne({id : id}, function(err, result){
 		done(null, result)
-	});
-});
+	})
+})
